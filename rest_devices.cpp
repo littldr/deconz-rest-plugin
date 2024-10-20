@@ -1140,7 +1140,6 @@ int RestDevices::putDeviceInstallCode(const ApiRequest &req, ApiResponse &rsp)
                 rsp.httpStatus = HttpStatusServiceUnavailable;
                 return REQ_READY_SEND;
             }
-            bool respOk = false;
 #if DECONZ_LIB_VERSION >= 0x010B00
             QVariantMap m;
             m["mac"] = uniqueid.toULongLong(&ok, 16);
@@ -1153,14 +1152,13 @@ int RestDevices::putDeviceInstallCode(const ApiRequest &req, ApiResponse &rsp)
             if (ok && strlen(mmoHashHex) == 32)
             {
                 ok = deCONZ::ApsController::instance()->setParameter(deCONZ::ParamLinkKey, m);
-                respOk = ok;
+                DBG_Printf(DBG_ERROR, "putDeviceInstallCode -> setParameter %s\n", ok);
             }
 #endif
             QVariantMap rspItem;
             QVariantMap rspItemState;
             rspItemState["installcode"] = installCode.data();
             rspItemState["mmohash"] = &mmoHashHex[0];
-            rspItemState["ok"] = respOk;
             rspItem["success"] = rspItemState;
             rsp.list.append(rspItem);
             rsp.httpStatus = HttpStatusOk;
