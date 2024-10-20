@@ -29,10 +29,8 @@
 
 using JsonDoc = StaticJsonDocument<1024 * 1024 * 2>; // 2 megabytes
 
-
 static void putJsonQVariantValue(JsonObject &obj, std::string key, const QVariant &value);
 static void putJsonArrayQVariantValue(JsonArray &arr, const QVariant &value);
-
 
 static RestDevicesPrivate *priv_;
 
@@ -44,12 +42,11 @@ public:
     char jsonBuffer[1024 * 1024];
 };
 
-RestDevices::RestDevices(QObject *parent) :
-    QObject(parent)
+RestDevices::RestDevices(QObject *parent) : QObject(parent)
 {
     d = new RestDevicesPrivate;
     priv_ = d;
-    plugin = qobject_cast<DeRestPluginPrivate*>(parent);
+    plugin = qobject_cast<DeRestPluginPrivate *>(parent);
     Q_ASSERT(plugin);
 }
 
@@ -134,9 +131,12 @@ static DeviceKey getDeviceKey(QLatin1String uniqueid)
 
         result <<= 4;
 
-        if      (ch >= '0' && ch <= '9') ch = ch - '0';
-        else if (ch >= 'a' && ch <= 'f') ch = (ch - 'a') + 10;
-        else if (ch >= 'A' && ch <= 'F') ch = (ch - 'A') + 10;
+        if (ch >= '0' && ch <= '9')
+            ch = ch - '0';
+        else if (ch >= 'a' && ch <= 'f')
+            ch = (ch - 'a') + 10;
+        else if (ch >= 'A' && ch <= 'F')
+            ch = (ch - 'A') + 10;
         else
         {
             result = 0;
@@ -181,10 +181,10 @@ bool deleteLight(LightNode *lightNode, DeRestPluginPrivate *plugin)
         // delete all group membership from light (todo this is messy)
         for (auto &group : lightNode->groups())
         {
-            //delete Light from all scenes.
+            // delete Light from all scenes.
             plugin->deleteLightFromScenes(lightNode->id(), group.id);
 
-            //delete Light from all groups
+            // delete Light from all groups
             group.actions &= ~GroupInfo::ActionAddToGroup;
             group.actions |= GroupInfo::ActionRemoveFromGroup;
             if (group.state != GroupInfo::StateNotInGroup)
@@ -366,7 +366,6 @@ int RestDevices::getDevice(const ApiRequest &req, ApiResponse &rsp)
                     // UTC in msec resolution
                     dt.setOffsetFromUtc(0);
                     itemMap[QLatin1String("lastupdated")] = dt.toString(QLatin1String("yyyy-MM-ddTHH:mm:ssZ"));
-
 
                     m2[ls.at(1)] = itemMap;
                     map[ls.at(0)] = m2;
@@ -659,8 +658,14 @@ bool ddfSerializeV1(JsonDoc &doc, const DeviceDescription &ddf, char *buf, size_
                 }
 
                 item["name"] = i.name.c_str();
-                if (!i.isPublic) { item["public"] = false; }
-                if (i.awake)     { item["awake"] = true; }
+                if (!i.isPublic)
+                {
+                    item["public"] = false;
+                }
+                if (i.awake)
+                {
+                    item["awake"] = true;
+                }
 
                 if (!i.description.isEmpty())
                 {
@@ -674,9 +679,18 @@ bool ddfSerializeV1(JsonDoc &doc, const DeviceDescription &ddf, char *buf, size_
 
                 if (!i.isStatic)
                 {
-                    if (!i.readParameters.isNull()  && (ddfFull || !i.isGenericRead))  { putItemParameter(item, "read", i.readParameters.toMap()); }
-                    if (!i.writeParameters.isNull() && (ddfFull || !i.isGenericWrite)) { putItemParameter(item, "write", i.writeParameters.toMap()); }
-                    if (!i.parseParameters.isNull() && (ddfFull || !i.isGenericParse)) { putItemParameter(item, "parse", i.parseParameters.toMap()); }
+                    if (!i.readParameters.isNull() && (ddfFull || !i.isGenericRead))
+                    {
+                        putItemParameter(item, "read", i.readParameters.toMap());
+                    }
+                    if (!i.writeParameters.isNull() && (ddfFull || !i.isGenericWrite))
+                    {
+                        putItemParameter(item, "write", i.writeParameters.toMap());
+                    }
+                    if (!i.parseParameters.isNull() && (ddfFull || !i.isGenericParse))
+                    {
+                        putItemParameter(item, "parse", i.parseParameters.toMap());
+                    }
                 }
                 if (!i.defaultValue.isNull())
                 {
@@ -701,7 +715,10 @@ bool ddfSerializeV1(JsonDoc &doc, const DeviceDescription &ddf, char *buf, size_
         {
             JsonObject binding = bindings.createNestedObject();
 
-            if      (bnd.isUnicastBinding) { binding["bind"] = "unicast"; }
+            if (bnd.isUnicastBinding)
+            {
+                binding["bind"] = "unicast";
+            }
             else if (bnd.isGroupBinding)
             {
                 binding["bind"] = "groupcast";
@@ -710,7 +727,10 @@ bool ddfSerializeV1(JsonDoc &doc, const DeviceDescription &ddf, char *buf, size_
 
             binding["src.ep"] = bnd.srcEndpoint;
 
-            if (bnd.dstEndpoint > 0) { binding["dst.ep"] = bnd.dstEndpoint; }
+            if (bnd.dstEndpoint > 0)
+            {
+                binding["dst.ep"] = bnd.dstEndpoint;
+            }
 
             char buf[16];
 
@@ -722,7 +742,7 @@ bool ddfSerializeV1(JsonDoc &doc, const DeviceDescription &ddf, char *buf, size_
             {
                 JsonArray reportings = binding.createNestedArray("report");
 
-                for (const DDF_ZclReport &rep: bnd.reporting)
+                for (const DDF_ZclReport &rep : bnd.reporting)
                 {
                     JsonObject report = reportings.createNestedObject();
 
@@ -841,21 +861,20 @@ int RIS_GetDeviceIntrospect(const ApiRequest &req, ApiResponse &rsp)
 QLatin1String RIS_DataTypeToString(ApiDataType type)
 {
     static const std::array<QLatin1String, 14> map = {
-         QLatin1String("unknown"),
-         QLatin1String("bool"),
-         QLatin1String("uint8"),
-         QLatin1String("uint16"),
-         QLatin1String("uint32"),
-         QLatin1String("uint64"),
-         QLatin1String("int8"),
-         QLatin1String("int16"),
-         QLatin1String("int32"),
-         QLatin1String("int64"),
-         QLatin1String("double"),
-         QLatin1String("string"),
-         QLatin1String("time"),
-         QLatin1String("timepattern")
-    };
+        QLatin1String("unknown"),
+        QLatin1String("bool"),
+        QLatin1String("uint8"),
+        QLatin1String("uint16"),
+        QLatin1String("uint32"),
+        QLatin1String("uint64"),
+        QLatin1String("int8"),
+        QLatin1String("int16"),
+        QLatin1String("int32"),
+        QLatin1String("int64"),
+        QLatin1String("double"),
+        QLatin1String("string"),
+        QLatin1String("time"),
+        QLatin1String("timepattern")};
 
     if (type < map.size())
     {
@@ -873,18 +892,17 @@ QLatin1String RIS_ButtonEventActionToString(int buttonevent)
     const uint action = buttonevent % 1000;
 
     static std::array<QLatin1String, 11> map = {
-         QLatin1String("INITIAL_PRESS"),
-         QLatin1String("HOLD"),
-         QLatin1String("SHORT_RELEASE"),
-         QLatin1String("LONG_RELEASE"),
-         QLatin1String("DOUBLE_PRESS"),
-         QLatin1String("TREBLE_PRESS"),
-         QLatin1String("QUADRUPLE_PRESS"),
-         QLatin1String("SHAKE"),
-         QLatin1String("DROP"),
-         QLatin1String("TILT"),
-         QLatin1String("MANY_PRESS")
-    };
+        QLatin1String("INITIAL_PRESS"),
+        QLatin1String("HOLD"),
+        QLatin1String("SHORT_RELEASE"),
+        QLatin1String("LONG_RELEASE"),
+        QLatin1String("DOUBLE_PRESS"),
+        QLatin1String("TREBLE_PRESS"),
+        QLatin1String("QUADRUPLE_PRESS"),
+        QLatin1String("SHAKE"),
+        QLatin1String("DROP"),
+        QLatin1String("TILT"),
+        QLatin1String("MANY_PRESS")};
 
     if (action < map.size())
     {
@@ -919,7 +937,7 @@ QVariantMap RIS_IntrospectButtonEventItem(const ResourceItemDescriptor &rid, con
     QVariantMap result = RIS_IntrospectGenericItem(rid);
 
     Q_ASSERT(r->prefix() == RSensors);
-    const auto *sensor = static_cast<const Sensor*>(r);
+    const auto *sensor = static_cast<const Sensor *>(r);
 
     if (!sensor)
     {
@@ -954,7 +972,8 @@ QVariantMap RIS_IntrospectButtonEventItem(const ResourceItemDescriptor &rid, con
         {
 
             const auto sd = std::find_if(node->simpleDescriptors().cbegin(), node->simpleDescriptors().cend(),
-                                         [&btn](const deCONZ::SimpleDescriptor &x){ return x.endpoint() == btn.endpoint; });
+                                         [&btn](const deCONZ::SimpleDescriptor &x)
+                                         { return x.endpoint() == btn.endpoint; });
 
             if (sd == node->simpleDescriptors().cend())
             {
@@ -972,7 +991,8 @@ QVariantMap RIS_IntrospectButtonEventItem(const ResourceItemDescriptor &rid, con
     }
 
     const auto buttonsMeta = std::find_if(buttonMapButtons.cbegin(), buttonMapButtons.cend(),
-                                          [buttonData](const auto &meta){ return meta.buttonMapRef.hash == buttonData->buttonMapRef.hash; });
+                                          [buttonData](const auto &meta)
+                                          { return meta.buttonMapRef.hash == buttonData->buttonMapRef.hash; });
 
     QVariantMap buttons;
 
@@ -990,7 +1010,7 @@ QVariantMap RIS_IntrospectButtonEventItem(const ResourceItemDescriptor &rid, con
     }
     else // fallback if no "buttons" is defined in the button map, generate a generic one
     {
-        for (int i = 1 ; i < 32; i++)
+        for (int i = 1; i < 32; i++)
         {
             if (buttonBits & (1 << i))
             {
@@ -1120,25 +1140,27 @@ int RestDevices::putDeviceInstallCode(const ApiRequest &req, ApiResponse &rsp)
                 rsp.httpStatus = HttpStatusServiceUnavailable;
                 return REQ_READY_SEND;
             }
-
+            bool respOk = false;
 #if DECONZ_LIB_VERSION >= 0x010B00
             QVariantMap m;
             m["mac"] = uniqueid.toULongLong(&ok, 16);
 
             if (mmoHash.size() == 16)
             {
-                DBG_HexToAscii(&mmoHash[0], mmoHash.size(), reinterpret_cast<unsigned char*>(&mmoHashHex[0]));
+                DBG_HexToAscii(&mmoHash[0], mmoHash.size(), reinterpret_cast<unsigned char *>(&mmoHashHex[0]));
             }
             m["key"] = &mmoHashHex[0];
             if (ok && strlen(mmoHashHex) == 32)
             {
                 ok = deCONZ::ApsController::instance()->setParameter(deCONZ::ParamLinkKey, m);
+                respOk = ok
             }
 #endif
             QVariantMap rspItem;
             QVariantMap rspItemState;
             rspItemState["installcode"] = installCode.data();
             rspItemState["mmohash"] = &mmoHashHex[0];
+            rspItemState["ok"] = respOk;
             rspItem["success"] = rspItemState;
             rsp.list.append(rspItem);
             rsp.httpStatus = HttpStatusOk;
@@ -1244,7 +1266,6 @@ int RestDevices::putDeviceSetDDFPolicy(const ApiRequest &req, ApiResponse &rsp)
         return REQ_READY_SEND;
     }
 
-
     if (cj_copy_value(&cj, policyBuf, sizeof(policyBuf), refParent, "policy") == 0)
     {
         rsp.list.append(errorToMap(ERR_MISSING_PARAMETER, errAddr, "missing parameters in body"));
@@ -1257,7 +1278,7 @@ int RestDevices::putDeviceSetDDFPolicy(const ApiRequest &req, ApiResponse &rsp)
      */
 
     policyLen = U_strlen(policyBuf);
-    const char *validValues[5] = { "latest_prefer_stable", "latest", "pin", "raw_json", nullptr };
+    const char *validValues[5] = {"latest_prefer_stable", "latest", "pin", "raw_json", nullptr};
 
     U_sstream_init(&ss, policyBuf, policyLen);
 
