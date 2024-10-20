@@ -1,0 +1,12 @@
+name: Build for OSX
+on: push
+jobs:
+  build:
+    name: Build on OSX
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          brew install qt@5 ninja cmake
+      - run: |
+          ./build-macos.sh
