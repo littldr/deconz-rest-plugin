@@ -1152,7 +1152,7 @@ int RestDevices::putDeviceInstallCode(const ApiRequest &req, ApiResponse &rsp)
             if (ok && strlen(mmoHashHex) == 32)
             {
                 ok = deCONZ::ApsController::instance()->setParameter(deCONZ::ParamLinkKey, m);
-                DBG_Printf(DBG_ERROR, "putDeviceInstallCode -> setParameter %s\n", ok);
+                DBG_Printf(DBG_ERROR, "putDeviceInstallCode -> setParameter return: %s\n", ok ? "true" : "false");
             }
 #endif
             QVariantMap rspItem;
