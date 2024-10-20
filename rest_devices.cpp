@@ -17,6 +17,7 @@
 #include "database.h"
 #include "device_descriptions.h"
 #include "device_ddf_bundle.h"
+#include "deconz/dbg_trace.h"
 #include "deconz/u_assert.h"
 #include "deconz/u_sstream_ex.h"
 #include "deconz/u_memory.h"
