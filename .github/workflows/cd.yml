@@ -6,8 +6,9 @@ jobs:
     runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          brew install qt@5 ninja
+      - uses: tecolicom/actions-use-homebrew-tools@v1
+        with:
+          tools: "qt@5 ninja"
       - run: |
           ./build-macos.sh
       - uses: actions/upload-artifact@v4
