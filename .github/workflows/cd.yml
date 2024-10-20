@@ -7,6 +7,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          brew install qt@5 ninja cmake
+          brew install qt@5 ninja
       - run: |
           ./build-macos.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libde_rest_plugin
+          path: build/libde_rest_plugin.dylib
